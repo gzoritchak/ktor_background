@@ -23,7 +23,7 @@ val LOG = LoggerFactory.getLogger("proto")
 fun main() = runBlocking {
     launch(Dispatchers.Default) {
         LOG.info("launch background")
-        scrapForever()
+        backgroundRequests()
     }
 
     launch(Dispatchers.Default) {
@@ -48,8 +48,8 @@ fun startServer() {
 val httpClient = HttpClient(Apache)
 var results = listOf<Int>()
 
-suspend fun scrapForever() {
-    LOG.info("scrapForever")
+suspend fun backgroundRequests() {
+    LOG.info("backgroundRequests")
     var loop = 0
     val loader = Loader()
     while (true) {
