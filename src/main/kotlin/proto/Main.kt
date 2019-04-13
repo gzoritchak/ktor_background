@@ -5,28 +5,35 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.call
 import io.ktor.client.engine.apache.Apache
 import io.ktor.client.response.HttpResponse
-import io.ktor.client.response.readBytes
-import io.ktor.client.response.readText
 import io.ktor.http.HttpStatusCode
 import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 
 val LOG = LoggerFactory.getLogger("proto")
 
-suspend fun main() = coroutineScope {
-    startServer()
-    launch {
+
+fun main() = runBlocking {
+    launch(Dispatchers.Default) {
+        LOG.info("launch background")
         scrapForever()
+    }
+
+    launch(Dispatchers.Default) {
+        LOG.info("launch ktor")
+        startServer()
     }
     LOG.info("Should never be logged")
 }
 
-suspend fun startServer() = coroutineScope {
+fun startServer() {
     val server = embeddedServer(Netty, port = 8080) {
         routing {
             get("/") {
@@ -41,7 +48,7 @@ suspend fun startServer() = coroutineScope {
 val httpClient = HttpClient(Apache)
 var results = listOf<Int>()
 
-suspend fun scrapForever() = coroutineScope {
+suspend fun scrapForever() {
     LOG.info("scrapForever")
     var loop = 0
     val loader = Loader()
